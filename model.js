@@ -24,6 +24,23 @@ const clientSchema = new mongoose.Schema({
     } , // Array of urls the client is allowed to redirect to
 });
 
+const userSchema = new mongoose.Schema({
+    userName:{
+      type: String,
+      unique: true,
+      required: true,
+      lowercase: true
+    }, // Unique string representing the user
+    passwordHash:{
+      type: String,
+      required: true
+    }, // Password of the user;
+    name:{
+      type: String,
+      required: true
+    }, // Name of the user
+});
+
 module.exports = {
   /**
    * Register a new client in the DB
@@ -89,7 +106,7 @@ module.exports = {
     return new promise('saveAuthorizationCode');
   },
 
-    getAccessToken: function(accessToken){
+  getAccessToken: function(accessToken){
     return new promise('getAccessToken');
   }
 }
