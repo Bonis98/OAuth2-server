@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     passwordHash:{
       type: String,
       required: true
-    }, // Password of the user;
+    }, // Hash password of the user;
     name:{
       type: String,
       required: true
