@@ -14,9 +14,9 @@ const clientSchema = new mongoose.Schema({
     }, // Unique string representing the client
     clientSecret: String, // Secret of the client; Can be null
     grants:{
-      type: String,
+      type: [String],
       required: true,
-      enum: ['authcode']
+      enum: ['authorization_code']
     }, // Array of grants that the client can use (ie, `authorization_code`)
     redirectUris:{
       type: [String],
@@ -28,7 +28,7 @@ module.exports = {
   /**
    * Register a new client in the DB
    * 
-   * @param {string} grantType type of grant supported by the client
+   * @param {array} grantType type of grants supported by the client
    * @param {array} redirect uris of the client
    */ 
   registerClient: async function(grantType, redirect){
@@ -60,8 +60,29 @@ module.exports = {
     while(!unique);
   },
 
-  getClient: function(clientId, clientSecret){
-    return new promise('getClient');
+  /**
+   * Retrive a client in the DB
+   * 
+   * @param {string} clientId Id of the client 
+   * @param {string} clientSecret Used to authenticate the client
+   */
+  getClient: async function(clientId, clientSecret){
+    //Prepare the model
+    const client = mongoose.model('client', clientSchema);
+    try{
+      //Query the DB
+      const clientRetrived = await client.findOne({clientId: clientId}).exec();
+      //If client secret is invalid, return false, otherwise return client details
+      return clientRetrived.clientSecret != clientSecret ? false :{
+        id: clientRetrived.clientId,
+        redirectUris: client.redirectUris,
+        grants: clientRetrived.grants 
+      }
+    }
+    catch(ex){
+      //Exception is printed because is not handled by the library
+      console.err(ex);
+    }
   },
 
   saveAuthorizationCode: function(code, client, user){
