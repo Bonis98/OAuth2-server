@@ -1,64 +1,10 @@
 const mongoose = require('mongoose');
+require('./utilities/DB/client');
 const crypto = require('crypto');
 const promise = require('promise');
 const config = require('./config.json');
 
 mongoose.connect(config.connectString);
-
-const clientSchema = new mongoose.Schema({
-    clientId:{
-      type: String,
-      unique: true,
-      required: true,
-      lowercase: true
-    }, // Unique string representing the client
-    clientSecret: String, // Secret of the client; Can be null
-    grants:{
-      type: [String],
-      required: true,
-      enum: ['authorization_code']
-    }, // Array of grants that the client can use (ie, `authorization_code`)
-    redirectUris:{
-      type: [String],
-      required: true
-    } , // Array of urls the client is allowed to redirect to
-});
-
-const userSchema = new mongoose.Schema({
-    userName:{
-      type: String,
-      unique: true,
-      required: true,
-      lowercase: true
-    }, // Unique string representing the user
-    passwordHash:{
-      type: String,
-      required: true
-    }, // Hash password of the user;
-    name:{
-      type: String,
-      required: true
-    }, // Name of the user
-});
-
-const authCodeSchema = new mongoose.Schema({
-    authorizationCode:{
-      type: String,
-      unique: true,
-      required: true,
-      lowercase: true
-    }, // Unique string representing the auth code
-    expiresAt:{
-      type: Date,
-      required: true
-    }, //Expiration of the token
-    redirectUri:{
-      type: String,
-      required: true
-    }, //Uri where to redirect after authorization
-    clientId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'client' }], //References client(id)
-    userId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }] //References user(id)
-});
 
 module.exports = {
   /**
@@ -68,9 +14,8 @@ module.exports = {
    * @param {array} redirect uris of the client
    */ 
   registerClient: async function(grantType, redirect){
-    const client = mongoose.model('client', clientSchema);
     //Generate new client
-    const newClient = new client({
+    const newClient = new mongoose.model('client')({
       clientId: crypto.randomBytes(5).toString('hex'),
       clientSecret: crypto.randomBytes(20).toString('hex'),
       grants: grantType,
@@ -104,7 +49,7 @@ module.exports = {
    */
   getClient: async function(clientId, clientSecret){
     //Prepare the model
-    const client = mongoose.model('client', clientSchema);
+    const client = new mongoose.model('client');
     try{
       //Query the DB
       const clientRetrived = await client.findOne({clientId: clientId}).exec();
