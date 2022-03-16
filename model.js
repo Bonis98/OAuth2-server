@@ -100,7 +100,7 @@ module.exports = {
    * Retrive a client in the DB
    * 
    * @param {string} clientId Id of the client 
-   * @param {string} clientSecret Used to authenticate the client
+   * @param {string} clientSecret Used to authenticate the client (can be null if no authentication is required)
    */
   getClient: async function(clientId, clientSecret){
     //Prepare the model
@@ -108,8 +108,10 @@ module.exports = {
     try{
       //Query the DB
       const clientRetrived = await client.findOne({clientId: clientId}).exec();
-      //If client secret is invalid, return false, otherwise return client details
-      return clientRetrived.clientSecret != clientSecret ? false :{
+      //If client secret is invalid, return false
+      if (clientSecret && clientRetrived.clientSecret != clientSecret) return false;
+      //Return client details
+      return {
         id: clientRetrived.clientId,
         redirectUris: client.redirectUris,
         grants: clientRetrived.grants 
