@@ -56,8 +56,8 @@ const authCodeSchema = new mongoose.Schema({
       type: String,
       required: true
     }, //Uri where to redirect after authorization
-    clientId:[{ type: Schema.Types.ObjectId, ref: 'client' }], //References client(id)
-    userId:[{ type: Schema.Types.ObjectId, ref: 'user' }] //References user(id)
+    clientId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'client' }], //References client(id)
+    userId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }] //References user(id)
 });
 
 module.exports = {
@@ -117,7 +117,7 @@ module.exports = {
     }
     catch(ex){
       //Exception is printed because is not handled by the library
-      console.err(ex);
+      console.error(ex);
     }
   },
 
