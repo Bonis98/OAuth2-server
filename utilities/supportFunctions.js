@@ -87,7 +87,7 @@ module.exports = {
     try{
       const userRetrived = await user.findOne({userName: username}).exec();
       //User not present in DB
-      if (!userRetrived) return callback("User is not registered", null);
+      if (!userRetrived) return callback('User is not registered', null);
       //Check the password
       bcrypt.compare(password, userRetrived.passwordHash, function(err, result){
         if (err) return callback(err, null);
