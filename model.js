@@ -24,7 +24,7 @@ module.exports = {
       //Return client details
       return {
         id: clientRetrived.clientId,
-        redirectUris: client.redirectUris,
+        redirectUris: clientRetrived.redirectUris,
         grants: clientRetrived.grants 
       }
     }
