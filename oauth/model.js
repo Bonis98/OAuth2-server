@@ -184,7 +184,31 @@ module.exports = {
     }
   },
 
-  getAccessToken: function(accessToken){
-    return new promise('getAccessToken');
+  /**
+   * Retrive a token in the DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#getaccesstoken-accesstoken-callback
+   * 
+   * @param {String} accessToken   Token to be retrived
+   */
+  getAccessToken: async function(accessToken){
+    //Prepare the model
+    let newToken = new mongoose.model('token')
+    try{
+      newToken = await newToken.findOne({accessToken: accessToken}).populate('clientId', 'clientId').populate('userId', 'userName')
+      let something = {
+        accessToken: newToken.accessToken,
+        accessTokenExpiresAt: newToken.accessTokenExpiresAt,
+        client: {
+          id: newToken.clientId[0].clientId,
+        },
+        user: newToken.userId[0].userName
+      }
+      return something
+    }
+    catch(ex){
+      throw ex
+    }
   }
 }
