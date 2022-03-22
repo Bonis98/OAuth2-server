@@ -1,41 +1,28 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express')
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const app = express()
+const port = 3030
+const bodyParser = require('body-parser')
+const oauthServer = require('./oauth/server.js')
 
-var app = express();
+const DebugControl = require('./utilities/debug.js')
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+//Here we are configuring express to use body-parser as middle-ware.
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+app.use(DebugControl.log.request())
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use('/client', require('./routes/client.js')) // Client routes
+app.use('/oauth', require('./routes/auth.js')) // routes to access the auth stuff
+// Note that the next router uses middleware. That protects all routes within this middleware
+/*app.use('/secure', (req,res,next) => {
+  DebugControl.log.flow('Authentication')
+  return next()
+},oauthServer.authenticate(), require('./routes/secure.js')) // routes to access the protected stuff*/
+app.use('/', (req,res) => res.redirect('/client'))
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+app.listen(port)
+console.log("Oauth Server listening on port ", port)
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
+module.exports = app // For testing

@@ -11,6 +11,7 @@
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "express-oauth-server": "^2.0.0",
     "http-errors": "~1.6.3",
     "mongodb": "^4.4.1",
     "mongoose": "^6.2.4",

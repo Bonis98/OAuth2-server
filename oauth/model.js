@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-require('./utilities/DB/client');
-require('./utilities/DB/authcode');
-require('./utilities/DB/user');
+require('../utilities/DB/client');
+require('../utilities/DB/authcode');
+require('../utilities/DB/user');
 const crypto = require('crypto');
 const promise = require('promise');
-const config = require('./config.json');
+const config = require('../config.json');
 
 mongoose.connect(config.connectString);
 

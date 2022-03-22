@@ -1,21 +1,14 @@
 const path = require('path') // has path and __dirname
 const express = require('express')
 const functions = require('../utilities/supportFunctions')
-const oauthServer = require('oauth2-server')
-const model = require('../model')
 
 const DebugControl = require('../utilities/debug.js')
 
+const oauth = require('../oauth/server')
 
 const router = express.Router() // Instantiate a new router
 
 const filePath = path.join(__dirname, '../public/oauthAuthenticate.html')
-
-const oauth = new oauthServer({
-  model:model,
-  accessTokenLifetime: 60 * 60 * 24,
-  grants: ['authorization_code']
-});
 
 router.get('/', (req,res) => {  // send back a simple form for the oauth
   res.sendFile(filePath)
@@ -42,19 +35,15 @@ router.post('/authorize', (req,res,next) => {
   })
 }, (req, res, next) => {
   DebugControl.log.flow('authorize')
-  oauth.authorize(new oauthServer.Request(req), new oauthServer.Response(res),{
+  return next()
+  },
+  oauth.authorize({
     authenticateHandler: {
       handle: req => {
         return req.body.username
       }
     }
-  }).then(
-  function (code){
-    res.redirect(code.redirectUri + '?code=' + code.authorizationCode + '&state=' + req.body.state)
-  },
-  function (err){
-    res.status(400).send(err)
   })
-})
+)
 
 module.exports = router
