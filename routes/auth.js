@@ -4,7 +4,7 @@ const functions = require('../utilities/supportFunctions')
 
 const DebugControl = require('../utilities/debug.js')
 
-const oauth = require('../oauth/server')
+const oauthServer = require('../oauth/server')
 
 const router = express.Router() // Instantiate a new router
 
@@ -14,6 +14,7 @@ router.get('/', (req,res) => {  // send back a simple form for the oauth
   res.sendFile(filePath)
 })
 
+//Get auth code
 router.post('/authorize', (req,res,next) => {
   functions.authenticateUser(req.body.username, req.body.password, function(err, result){
     if (!result || err) {
@@ -37,7 +38,7 @@ router.post('/authorize', (req,res,next) => {
   DebugControl.log.flow('authorize')
   return next()
   },
-  oauth.authorize({
+  oauthServer.authorize({
     authenticateHandler: {
       handle: req => {
         return req.body.username
@@ -45,5 +46,11 @@ router.post('/authorize', (req,res,next) => {
     }
   })
 )
+
+//Get token from auth code
+router.post('/token', (req,res,next) => {
+  DebugControl.log.flow('Token')
+  next()
+},oauthServer.token())  // Sends back token
 
 module.exports = router
