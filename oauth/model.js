@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 require('../utilities/DB/client');
 require('../utilities/DB/authcode');
 require('../utilities/DB/user');
+require('../utilities/DB/token');
 const crypto = require('crypto');
 const promise = require('promise');
 const config = require('../config.json');
@@ -107,6 +108,75 @@ module.exports = {
           id: authCode.clientId[0].clientId,
         },
         user: authCode.userId[0].userName
+      }
+    }
+    catch(ex){
+      throw ex
+    }
+  },
+
+  /**
+   * Revoke an authorization code in the DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#revokeauthorizationcode-code-callback
+   * 
+   * @param {Object} code    Code to be revoked
+   */
+  revokeAuthorizationCode: async function(code){
+    let authCode = new mongoose.model('authcode')
+    try{
+      authCode = await authCode.deleteOne({authorizationCode: code.code})
+      if (authCode.deletedCount == 1) return true
+      else return false
+    }
+    catch(ex){
+      throw ex
+    }
+  },
+
+  /**
+   * Save a new token in the DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#savetoken-token-client-user-callback
+   * 
+   * @param {Object} token    Token to be saved
+   * @param {Object} client   Client associated with the token
+   * @param {Object} user     User associated with the token
+   */
+  saveToken: async function(token, client, user){
+    //Retrive information of user and client from DB
+    let newUser = new mongoose.model('user')
+    let newClient = mongoose.model('client')
+    try{
+      //Client query is already present in the model (due to getClient())
+      newClient = await newClient.findOne()
+      newUser = await newUser.findOne({userName: user}).exec()
+    }
+    catch(ex){
+      throw ex
+    }
+    //Prepare new document
+    let newToken = new mongoose.model('token')({
+      accessToken: token.accessToken,
+      accessTokenExpiresAt: token.accessTokenExpiresAt,
+      clientId: newClient._id,
+      userId: newUser._id
+    })
+    try{
+      //Save document
+      await newToken.save()
+      //Return informations
+      return {
+        accessToken: token.accessToken,
+        accessTokenExpiresAt: token.accessTokenExpiresAt,
+        refreshToken: token.refreshToken,
+        refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+        client: {
+          id: newClient.clientId
+        },
+        user: newUser.userName
       }
     }
     catch(ex){
