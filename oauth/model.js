@@ -15,8 +15,8 @@ module.exports = {
    * More can be found here:
    * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#getclient-clientid-clientsecret-callback
    * 
-   * @param {string} clientId Id of the client 
-   * @param {string} clientSecret Used to authenticate the client (can be null if no authentication is required)
+   * @param {string} clientId       Id of the client 
+   * @param {string} clientSecret   Used to authenticate the client (can be null if no authentication is required)
    */
   getClient: async function(clientId, clientSecret){
     //Prepare the model
@@ -42,12 +42,12 @@ module.exports = {
   /**
    * Save a new authorization code in the DB
    * 
-   * More ca be found here: 
+   * More can be found here: 
    * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#saveauthorizationcode-code-client-user-callback
    * 
-   * @param {object} Code to be saved
-   * @param {object} Client associated with the auth code
-   * @param {object} User associated with the auth code
+   * @param {object} code     Code to be saved
+   * @param {object} client   Client associated with the auth code
+   * @param {object} user     User associated with the auth code
    */
   saveAuthorizationCode: async function(code, client, user){
     //Retrive information of user and client from DB
@@ -80,6 +80,33 @@ module.exports = {
         client: this.client,
         clientId: client.id,
         userId: {user:this.user}
+      }
+    }
+    catch(ex){
+      throw ex
+    }
+  },
+
+  /**
+   * Retrive an authorization code from DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#getauthorizationcode-authorizationcode-callback
+   * 
+   * @param {String} authorizationCode    Code to be saved
+   */
+  getAuthorizationCode: async function(authorizationCode){
+    let authCode = new mongoose.model('authcode')
+    try{
+      authCode = await authCode.findOne({authorizationCode: authorizationCode}).populate('clientId', 'clientId').populate('userId', 'userName')
+      return {
+        code: authCode.authorizationCode,
+        expiresAt: authCode.expiresAt,
+        redirectUri: authCode.redirectUri,
+        client: {
+          id: authCode.clientId[0].clientId,
+        },
+        user: authCode.userId[0].userName
       }
     }
     catch(ex){
