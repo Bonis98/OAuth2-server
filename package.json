@@ -9,7 +9,8 @@
     "bcrypt": "^5.0.1",
     "express": "~4.16.1",
     "express-oauth-server": "^2.0.0",
-    "mongoose": "^6.2.4"
+    "mongoose": "^6.2.4",
+    "promise": "^8.1.0"
   },
   "main": "app.js",
   "author": "Marco Bonissi",
