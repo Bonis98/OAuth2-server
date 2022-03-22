@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 require('./utilities/DB/client');
+require('./utilities/DB/authcode');
+require('./utilities/DB/user');
 const crypto = require('crypto');
 const promise = require('promise');
 const config = require('./config.json');
@@ -9,6 +11,9 @@ mongoose.connect(config.connectString);
 module.exports = {
   /**
    * Retrive a client in the DB
+   * 
+   * More can be found here:
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#getclient-clientid-clientsecret-callback
    * 
    * @param {string} clientId Id of the client 
    * @param {string} clientSecret Used to authenticate the client (can be null if no authentication is required)
@@ -34,8 +39,52 @@ module.exports = {
     }
   },
 
-  saveAuthorizationCode: function(code, client, user){
-    return new promise('saveAuthorizationCode');
+  /**
+   * Save a new authorization code in the DB
+   * 
+   * More ca be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#saveauthorizationcode-code-client-user-callback
+   * 
+   * @param {object} Code to be saved
+   * @param {object} Client associated with the auth code
+   * @param {object} User associated with the auth code
+   */
+  saveAuthorizationCode: async function(code, client, user){
+    //Retrive information of user and client from DB
+    let newUser = new mongoose.model('user')
+    let newClient = mongoose.model('client')
+    try{
+      //Client query is already present in the model (due to getClient())
+      newClient = await newClient.findOne()
+      newUser = await newUser.findOne({userName: user}).exec()
+    }
+    catch(ex){
+      throw ex
+    }
+    //Prepare new document
+    const newCode = new mongoose.model('authcode')({
+      authorizationCode: code.authorizationCode,
+      expiresAt: code.expiresAt,
+      redirectUri: code.redirectUri,
+      clientId: newClient._id,
+      userId: newUser._id
+    });
+    try{
+      //Save document
+      await newCode.save()
+      //Return informations
+      return {
+        authorizationCode: code.authorizationCode,
+        expiresAt: code.expiresAt,
+        redirectUri: code.redirectUri,
+        client: this.client,
+        clientId: client.id,
+        userId: {user:this.user}
+      }
+    }
+    catch(ex){
+      throw ex
+    }
   },
 
   getAccessToken: function(accessToken){
