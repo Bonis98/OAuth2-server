@@ -25,6 +25,7 @@ module.exports = {
     try{
       //Query the DB
       const clientRetrived = await client.findOne({clientId: clientId}).exec();
+      if (!clientRetrived) return false
       //If client secret is invalid, return false
       if (clientSecret && clientRetrived.clientSecret != clientSecret) return false;
       //Return client details
@@ -98,7 +99,8 @@ module.exports = {
   getAuthorizationCode: async function(authorizationCode){
     let authCode = new mongoose.model('authcode')
     try{
-      authCode = await authCode.findOne({authorizationCode: authorizationCode}).populate('clientId', 'clientId').populate('userId', 'userName')
+      authCode = await authCode.findOne({authorizationCode: authorizationCode, used: false}).populate('clientId', 'clientId').populate('userId', 'userName')
+      if (!authCode) return false
       return {
         code: authCode.authorizationCode,
         expiresAt: authCode.expiresAt,
@@ -125,8 +127,10 @@ module.exports = {
   revokeAuthorizationCode: async function(code){
     let authCode = new mongoose.model('authcode')
     try{
-      authCode = await authCode.deleteOne({authorizationCode: code.code})
-      if (authCode.deletedCount == 1) return true
+      authCode = await authCode.updateOne({authorizationCode: code.code}, {
+        used: true
+      })
+      if (authCode) return true
       else return false
     }
     catch(ex){
@@ -195,6 +199,7 @@ module.exports = {
     let newToken = new mongoose.model('token')
     try{
       newToken = await newToken.findOne({accessToken: accessToken}).populate('clientId', 'clientId').populate('userId', 'userName')
+      if (!newToken) return false
       return {
         accessToken: newToken.accessToken,
         accessTokenExpiresAt: newToken.accessTokenExpiresAt,
