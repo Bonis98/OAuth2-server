@@ -23,14 +23,14 @@ app.all('*', function(req, res, next){
   res.redirect(307, 'https://' + req.hostname + req.url)
 })
 
-//app.use('/client', require('./routes/client.js')) // Client routes
+app.use('/client', require('./routes/client.js')) // Client routes
+app.use('/user', require('./routes/user.js')) // user routes
 app.use('/oauth', require('./routes/auth.js')) // routes to access the auth stuff
 // Note that the next router uses middleware. That protects all routes within this middleware
 app.use('/secure', (req,res,next) => {
   DebugControl.log.flow('Authentication')
   return next()
 },oauthServer.authenticate(), require('./routes/secure.js')) // routes to access the protected stuff
-//app.use('/', (req,res) => res.redirect('/client'))
 
 http.createServer(app).listen(80)
 https.createServer({
