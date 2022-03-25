@@ -13,10 +13,8 @@
       <input type ='url' class='form-control' name='redirect_uri'/>
     </div>
     <div class='form-group'>
-      <label>Grant type</label>
-      <select class="form-control" name='grant'>
-        <option selected>authorization_code</option>
-      </select>
+      <label>Grant type (ex: "authorization_code;refresh_token;")</label>
+      <input type ='text' pattern= '^((authorization_code;)?(refresh_token;)?){1}$' class='form-control' name='grant' required/>
     </div>
     <input type='submit' class='btn btn-success' />
   </form>

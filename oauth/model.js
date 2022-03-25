@@ -163,6 +163,8 @@ module.exports = {
     let newToken = new mongoose.model('token')({
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
+      refreshToken: token.refreshToken,
+      refreshTokenExpiresAt: token.refreshTokenExpiresAt,
       clientId: newClient._id,
       userId: newUser._id
     })
@@ -208,6 +210,56 @@ module.exports = {
         },
         user: newToken.userId[0].userName
       }
+    }
+    catch(ex){
+      throw ex
+    }
+  },
+
+  /**
+   * Retrive a refresh token in the DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#model-getrefreshtoken
+   * 
+   * @param {String} refreshToken   Token to be retrived
+   */
+  getRefreshToken: async function(refreshToken){
+    //Prepare the model
+    let newToken = new mongoose.model('token')
+    try{
+      newToken = await newToken.findOne({refreshToken: refreshToken, refreshTokenRevoked: false}).populate('clientId', 'clientId').populate('userId', 'userName')
+      if (!newToken) return false
+      return {
+        refreshToken: newToken.refreshToken,
+        refreshTokenExpiresAt: newToken.refreshTokenExpiresAt,
+        client: {
+          id: newToken.clientId[0].clientId,
+        },
+        user: newToken.userId[0].userName
+      }
+    }
+    catch(ex){
+      throw ex
+    }
+  },
+
+  /**
+   * Revoke a refresh token in the DB
+   * 
+   * More can be found here: 
+   * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#revoketoken-token-callback
+   * 
+   * @param {Object} token    Refresh token to be revoked
+   */
+  revokeToken: async function(token){
+    let newToken = new mongoose.model('token')
+    try{
+      newToken = await newToken.updateOne({refreshToken: token.refreshToken}, {
+        refreshTokenRevoked: true
+      })
+      if (newToken) return true
+      else return false
     }
     catch(ex){
       throw ex

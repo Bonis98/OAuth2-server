@@ -11,7 +11,7 @@ const clientSchema = new mongoose.Schema({
     grants:{
       type: [String],
       required: true,
-      enum: ['authorization_code']
+      enum: ['authorization_code', 'refresh_token']
     }, // Array of grants that the client can use (ie, `authorization_code`)
     redirectUris:{
       type: [String],

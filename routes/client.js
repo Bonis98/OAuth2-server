@@ -6,7 +6,9 @@ const functions = require('../utilities/supportFunctions')
 router.get('/', (req,res) => res.sendFile(path.join(__dirname, '../public/clientRegistration.html')))
 
 router.post('/register', (req,res) => {
-	functions.registerClient(req.body.grant, req.body.redirect_uri).then(
+	//Convert grants String to array
+	const grants = req.body.grant.slice(0, -1).split(';')
+	functions.registerClient(grants, req.body.redirect_uri).then(
 		function(suc){
 			res.json({
 				clientId: suc.clientId,
