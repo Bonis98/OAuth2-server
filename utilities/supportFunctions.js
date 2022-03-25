@@ -70,6 +70,7 @@ module.exports = {
         return callback("User registered")
       }
       catch(ex){
+        if (ex.code == 11000) return callback("Username is already in use")
         throw ex;
       }
     });

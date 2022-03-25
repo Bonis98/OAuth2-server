@@ -55,8 +55,7 @@ module.exports = {
     let newUser = new mongoose.model('user')
     let newClient = mongoose.model('client')
     try{
-      //Client query is already present in the model (due to getClient())
-      newClient = await newClient.findOne()
+      newClient = await newClient.findOne({clientId: client.id}).exec()
       newUser = await newUser.findOne({userName: user}).exec()
     }
     catch(ex){
@@ -150,8 +149,7 @@ module.exports = {
     let newUser = new mongoose.model('user')
     let newClient = mongoose.model('client')
     try{
-      //Client query is already present in the model (due to getClient())
-      newClient = await newClient.findOne()
+      newClient = await newClient.findOne({clientId: client.id}).exec()
       newUser = await newUser.findOne({userName: user}).exec()
     }
     catch(ex){
@@ -197,7 +195,7 @@ module.exports = {
     let newToken = new mongoose.model('token')
     try{
       newToken = await newToken.findOne({accessToken: accessToken}).populate('clientId', 'clientId').populate('userId', 'userName')
-      let something = {
+      return {
         accessToken: newToken.accessToken,
         accessTokenExpiresAt: newToken.accessTokenExpiresAt,
         client: {
@@ -205,7 +203,6 @@ module.exports = {
         },
         user: newToken.userId[0].userName
       }
-      return something
     }
     catch(ex){
       throw ex
