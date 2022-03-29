@@ -10,7 +10,7 @@ const router = express.Router() // Instantiate a new router
 
 const filePath = path.join(__dirname, '../public/oauthAuthenticate.html')
 
-router.get('/', (req,res) => {  // send back a simple form for the oauth
+router.get('/authorize', (req,res) => {  // send back a simple form for the oauth
   res.sendFile(filePath)
 })
 
@@ -28,9 +28,9 @@ router.post('/authorize', (req,res,next) => {
       ]
       .map(a => `${a}=${req.body[a]}`)
       .join('&')
-      if (err === 'User is not registered') res.redirect(`/oauth?user=false&${params}`)
-      else if (!result) res.redirect(`/oauth?success=false&${params}`)
-      else res.redirect(`/oauth?error=true&${params}`)
+      if (err === 'User is not registered') res.redirect(`/oauth/authorize?user=false&${params}`)
+      else if (!result) res.redirect(`/oauth/authorize?success=false&${params}`)
+      else res.redirect(`/oauth/authorize?error=true&${params}`)
     }
     else next()
   })
