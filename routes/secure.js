@@ -4,7 +4,7 @@ const DebugControl = require('../utilities/debug.js')
 
 router.get('/', (req,res) => {  // Successfully reached if can hit this :)
   DebugControl.log.variable({name: 'res.locals.oauth.token', value: res.locals.oauth.token})
-  res.send("Access to protected resource granted!")
+  res.json({"message":"Access to protected resource granted!"})
 })
 
 module.exports = router
