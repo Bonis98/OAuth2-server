@@ -8,7 +8,7 @@ Example of an oauth 2.0 server written in Nodejs. The server is based on oauth2-
 1. Clone this Repo
 1. `cd` into the project root folder, and run `npm install`
     - If `npm` is not installed, install it and then run `npm install`
-1. Run `npm start` to boot up the oauth 2.0 server
+1. Run `npm start` to boot up the oauth 2.0 Server
 1. Run `npm test` to run unit tests that cover all implemented grants
     - For verbose output, modify `level` in `tests/setup.js` to be `DebugControl.levels.ALL`
 
@@ -30,7 +30,7 @@ In order to provide the connection string, you have to create a file called `con
 <a id='ssl'></a>
 # SSL support
 
-By default the oauth 2.0 redirects all the connections to the HTTPS server. In order to get it to work you have to create a folder named `cert` and put inside the `server.cert` and `server.key` files.
+By default the oauth 2.0 Server redirects all the connections to the HTTPS server. In order to get it to work you have to create a folder named `cert` and put inside the `server.cert` and `server.key` files.
 You can generate a certificate using the command:
 ```shell
 openssl req -nodes -new -x509 -keyout server.key -out server.cert
@@ -60,7 +60,7 @@ https.createServer({
 <a id='url'></a>
 # URL Queries and Formatting
 
-Once everything is set up server is ready to Server requests. The Server is able to handle these requests:
+Once everything is set up Server is ready to Server requests. The Server is able to handle these requests:
 
 1. Client registration
 1. User registration
@@ -75,7 +75,7 @@ This section will outline how each of these requests ought to be formatted to su
 <a id='url-client'></a>
 ### Client registration
 
-The request to register a client is one of the simplest requiring a GET on the URL `/client`. The server will send back a form to compile with the redirect URI and the grant types.
+The request to register a client is one of the simplest requiring a GET on the URL `/client`. The Server will send back a form to compile with the redirect URI and the grant types.
 Grant types must be specified as a set of semicolon separated values, as an example: `authorization_code;refresh_token;` is a valid string.
 Server will validate the form and send back a `client_id` and a `client_secret`.
 
@@ -84,7 +84,7 @@ Server will validate the form and send back a `client_id` and a `client_secret`.
 <a id='url-user'></a>
 ### User registration
 
-The request to register a user is one of the simplest requiring a GET on the URL `/user`. The server will send back a form to compile with the username, password and name of the user.
+The request to register a user is one of the simplest requiring a GET on the URL `/user`. The Server will send back a form to compile with the username, password and name of the user.
 Server will validate the form and send back a success or error message.
 
 [back](#top)
