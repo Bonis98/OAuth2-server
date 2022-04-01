@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const functions = require('../utilities/supportFunctions')
 
-router.get('/', (req,res) => res.sendFile(path.join(__dirname, '../public/clientRegistration.html')))
+router.get('/register', (req,res) => res.sendFile(path.join(__dirname, '../public/clientRegistration.html')))
 
 router.post('/register', (req,res) => {
 	//Convert grants String to array
@@ -16,7 +16,6 @@ router.post('/register', (req,res) => {
 			})
 		},
 		function(err){
-			console.error(err)
 			res.send(err)
 		})
 })

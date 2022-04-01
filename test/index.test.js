@@ -6,9 +6,6 @@ chai.use(chaiHttp)
 
 const {server} = require('./setup.js')
 
-//Disable ssl certificate validation (self signed certificate)
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 let validData = {
   code: '',
   tokenFrom: {
@@ -20,9 +17,88 @@ let validData = {
 }
 
 const userTypes = [
-  {valid: true, type:'valid', username: 'username', password: 'password'},
-  {valid: false, type:'invalid', username: 'user', password: 'pass'},
+  {valid: true, type:'valid', name: 'example', username: 'username', password: 'password', confirm: 'password'},
+  {valid: false, type:'invalid', name: 'example', username: 'user', password: 'pass', confirm: 'password'},
 ]
+
+const clientTypes = [
+  {valid: true, type:'valid', redirect_uri: 'http://example.com', grants: 'authorization_code;'},
+  {valid: false, type:'invalid', redirect_uri: 'invalid', grants: 'authorization_co;'}
+]
+
+describe('/client', () => {
+  const base = '/client'
+  describe('/', () => {
+    const url = `${base}/register`
+    describe('GET', () => {
+      it('Should return a file', () => {
+        return chai.request(server)
+          .get(url)
+          .then(res => res.status.should.equal(200))
+      })
+    })
+    describe('POST', () => {
+      clientTypes.forEach(client => {
+        it(`${client.type} client should${client.valid ? '' : ' not'} return a client ID and client secret pair`, () => {
+          return chai.request(server)
+            .post(url)
+            .set('Content-Type', 'application/x-www-form-urlencoded')
+            .send({
+              redirect_uri: client.redirect_uri,
+              grant: client.grants,
+            })
+            .then(res => {
+              res.status.should.equal(200)
+              if(client.valid) {
+                res.body.should.have.property('clientId').to.match(/[ -~]{10}/)
+                res.body.should.have.property('clientSecret').to.match(/[ -~]{40}/)
+              } else {
+                res.body.should.not.have.property('clientId').to.match(/[ -~]{10}/)
+                res.body.should.not.have.property('clientSecret').to.match(/[ -~]{40}/)
+              }
+            })
+        })
+      })
+    })
+  })
+})
+
+describe('/user', () => {
+  const base = '/user'
+  describe('/', () => {
+    const url = `${base}/register`
+    describe('GET', () => {
+      it('Should return a file', () => {
+        return chai.request(server)
+          .get(url)
+          .then(res => res.status.should.equal(200))
+      })
+    })
+    describe('POST', () => {
+      userTypes.forEach(user => {
+        it(`registration of a ${user.type} user should${user.valid ? '' : ' not'} return a successfull registration message`, () => {
+          return chai.request(server)
+            .post(url)
+            .set('Content-Type', 'application/x-www-form-urlencoded')
+            .send({
+              name: user.name,
+              username: user.username,
+              password: user.password,
+              confirm: user.confirm,
+            })
+            .then(res => {
+              res.status.should.equal(200)
+              if(user.valid) {
+                res.text.should.equal('User registered')
+              } else {
+                res.text.should.not.include('User registered')
+              }
+            })
+        })
+      })
+    })
+  })
+})
 
 describe('/oauth', () => {
   const base = '/oauth'
@@ -44,7 +120,7 @@ describe('/oauth', () => {
             .send({
               client_id: 'test_client_id',
               response_type: 'code',
-              redirect_uri: 'http://localhost/client',
+              redirect_uri: 'http://localhost/client/register', //Using a URI that will respond with 200
               state: 'test_state',
               username: user.username,
               password: user.password,
@@ -56,7 +132,7 @@ describe('/oauth', () => {
               const newLocation = res.redirects[0]
 
               if(user.valid) {
-                const beginning = 'http://localhost/client?code='
+                const beginning = 'http://localhost/client/register?code='
                 newLocation.should.include(beginning)
                 const expectedState = 'state=test_state'
                 newLocation.should.include(expectedState)
@@ -85,7 +161,7 @@ describe('/oauth', () => {
           .send({
             client_id: 'test_client_id',
             client_secret: 'test_client_secret',
-            redirect_uri: 'http://localhost/client',
+            redirect_uri: 'http://localhost/client/register',
             grant_type: 'authorization_code',
             code: validData.code,
           })
@@ -162,8 +238,7 @@ describe('/secure Routes', () => {
         .get(base)
         .set('Authorization', 'bearer' + validData.tokenFrom.code)
         .then(res => {
-          res.should.have.status(200) // Unauthorized
-          //res.body.includes('Access to protected resource granted!')
+          res.should.have.status(200)
         })
     })
 
@@ -172,8 +247,7 @@ describe('/secure Routes', () => {
         .get(base)
         .set('Authorization', validData.tokenFrom.refresh)
         .then(res => {
-          res.should.have.status(200) // Unauthorized
-          //res.body.should.deep.equal('Access to protected resource granted!')
+          res.should.have.status(200)
         })
     })
 
@@ -182,8 +256,7 @@ describe('/secure Routes', () => {
         .get(base)
         .set('Authorization', validData.tokenFrom.refreshedRefresh)
         .then(res => {
-          res.should.have.status(200) // Unauthorized
-          //res.body.should.deep.equal('Access to protected resource granted!')
+          res.should.have.status(200)
         })
     })
 
