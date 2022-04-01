@@ -1,5 +1,5 @@
 # OAuth2-server
-Example of an oauth 2.0 server written in Nodejs. The server is based on oauth2-server (https://www.npmjs.com/package/oauth2-server) and express-oauth-server
+Example of an Oauth 2.0 server written in Nodejs. The server is based on Oauth2-server (https://www.npmjs.com/package/oauth2-server) and express-oauth-server
 (https://www.npmjs.com/package/express-oauth-server) and supports authorization_code grant and refresh_token grant.
 
 <a id='install'></a>
@@ -8,7 +8,7 @@ Example of an oauth 2.0 server written in Nodejs. The server is based on oauth2-
 1. Clone this Repo
 1. `cd` into the project root folder, and run `npm install`
     - If `npm` is not installed, install it and then run `npm install`
-1. Run `npm start` to boot up the oauth 2.0 Server
+1. Run `npm start` to boot up the Oauth 2.0 Server
 1. Run `npm test` to run unit tests that cover all implemented grants
     - For verbose output, modify `level` in `tests/setup.js` to be `DebugControl.levels.ALL`
 
@@ -17,7 +17,7 @@ Example of an oauth 2.0 server written in Nodejs. The server is based on oauth2-
 <a id='database'></a>
 # Database
 
-The oauth 2.0 Server require a MongoDB connection. The DB structure can be seen in `utilities/DB`.
+The Oauth 2.0 Server require a MongoDB connection. The DB structure can be seen in `utilities/DB`.
 In order to provide the connection string, you have to create a file called `config.json` with this structure
 ```json
 {
@@ -30,8 +30,8 @@ In order to provide the connection string, you have to create a file called `con
 <a id='ssl'></a>
 # SSL support
 
-By default the oauth 2.0 Server redirects all the connections to the HTTPS server. In order to get it to work you have to create a folder named `cert` and put inside the `server.cert` and `server.key` files.
-You can generate a certificate using the command:
+By default the Oauth 2.0 Server redirects all the connections to the HTTPS server. In order to get it to work you have to create a folder named `cert` and put inside the `server.cert` and `server.key` files.
+You can generate them using the command:
 ```shell
 openssl req -nodes -new -x509 -keyout server.key -out server.cert
 ```
@@ -54,13 +54,24 @@ https.createServer({
   cert: fs.readFileSync('./cert/server.cert'),
 }, app).listen(port)
 ```
+You also have to insert this object in the document `clients` in MongoDB:
+```json
+{
+"clientId": "test_client_id",
+"clientSecret":"test_client_secret",
+"grants":["authorization_code","refresh_token"],
+"redirectUris":["http://localhost/client/register"],
+"__v": 0
+}
+```
+Running a test will create a test user (username: username, password:password, name:exmaple). If a test is runned twice, user creation will return an error (due to duplicate user), you have to delete from MongoDB the test user before re-run it.
 
 [back](#top)
 
 <a id='url'></a>
 # URL Queries and Formatting
 
-Once everything is set up Server is ready to Server requests. The Server is able to handle these requests:
+Once everything is set up the Server is able to handle these requests:
 
 1. Client registration
 1. User registration
@@ -75,17 +86,17 @@ This section will outline how each of these requests ought to be formatted to su
 <a id='url-client'></a>
 ### Client registration
 
-The request to register a client is one of the simplest requiring a GET on the URL `/client`. The Server will send back a form to compile with the redirect URI and the grant types.
+The request to register a client is one of the simplest requiring a GET on the URL `/client/register`. The Server will send back a form to compile with the redirect URI and the grant types.
 Grant types must be specified as a set of semicolon separated values, as an example: `authorization_code;refresh_token;` is a valid string.
-Server will validate the form and send back a `client_id` and a `client_secret`.
+The server will validate the form and send back a `client_id` and a `client_secret`.
 
 [back](#top)
 
 <a id='url-user'></a>
 ### User registration
 
-The request to register a user is one of the simplest requiring a GET on the URL `/user`. The Server will send back a form to compile with the username, password and name of the user.
-Server will validate the form and send back a success or error message.
+The request to register a user is one of the simplest requiring a GET on the URL `/user/register`. The Server will send back a form to compile with the username, password and name of the user.
+The server will validate the form and send back a success or error message.
 
 [back](#top)
 
@@ -100,7 +111,7 @@ The request for an authorization code can be made using a GET on the url `/oauth
 
 These parameters can be included within the body of a POST request, or be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code`
 
-Server will respond with an error or a redirect to the redirect_uri.
+The server will respond with an error or a redirect to the redirect_uri.
 
 [back](#top)
 
@@ -117,9 +128,9 @@ The request should additionally have the following header:
 
 `'Content-Type': 'application/x-www-form-urlencoded'`
 
-and the data should be provided within the body of a post request.
+and the data must be provided within the body of a post request.
 
-Server will respond with an access token and a refresh token.
+The server will respond with an access token and a refresh token.
 
 [back](#top)
 
@@ -134,6 +145,6 @@ An example of access to protected reosurce can be simulated using a GET on the U
 }
 ```
 
-Server will respond with a positive messagge in case of a correct request.
+The s erver will respond with a positive messagge in case of a correct request.
 
 [back](#top)
