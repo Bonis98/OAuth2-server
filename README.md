@@ -110,7 +110,7 @@ The request for an authorization code can be made using a GET on the url `/oauth
 - response_type // what the client is expecting. Should be `code`
 - state // Provided by the client to prevent CSRF
 
-These parameters can be included within the body of a POST request, or be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code`
+These parameters can be included within the body of a POST request, or be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code&state=<STATE>`
 
 The server will respond with an error or a redirect to the redirect_uri.
 
