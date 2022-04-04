@@ -118,10 +118,10 @@ The server will respond with an error or a redirect to the redirect_uri.
 <a id='url-token'></a>
 ### Token
 
-The request for an authorization code can be made using a POST on the url `/oauth/token`. It requires the following information:
+The request for an access token can be made using a POST on the url `/oauth/token`. It requires the following information:
 
 - client_id // Unique string of client
-- client_secret (if applicable) // client secret key
+- client_secret // client secret key
 - grant_type // authorization_code in this example
 
 The request should additionally have the following header:
