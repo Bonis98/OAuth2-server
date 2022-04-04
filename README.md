@@ -108,6 +108,7 @@ The request for an authorization code can be made using a GET on the url `/oauth
 - client_id // The unique string identifying a client
 - redirect_uri // The place to redirect after receiving the code
 - response_type // what the client is expecting. Should be `code`
+- state // Provided by the client to prevent CSRF
 
 These parameters can be included within the body of a POST request, or be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code`
 
@@ -123,6 +124,8 @@ The request for an access token can be made using a POST on the url `/oauth/toke
 - client_id // Unique string of client
 - client_secret // client secret key
 - grant_type // authorization_code in this example
+- code //the authorization code of prevoius step
+- redirect_uri //redirect uri provided in the previous step 
 
 The request should additionally have the following header:
 
