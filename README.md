@@ -110,7 +110,7 @@ The request for an authorization code can be made using a GET on the url `/oauth
 - response_type // what the client is expecting. Should be `code`
 - state // Provided by the client to prevent CSRF
 
-These parameters can be included within the body of a POST request, or be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code&state=<STATE>`
+These parameters have to be sent as URL Query Parameters like this: `/oauth/authorize?client_id=<ID>&redirect_uri=<URL>&response_type=code&state=<STATE>`
 
 The server will respond with an error or a redirect to the redirect_uri.
 
@@ -137,6 +137,27 @@ The server will respond with an access token and a refresh token.
 
 [back](#top)
 
+<a id='url-token'></a>
+### Refresh Token
+
+The request for a new refreshed access token can be made using a POST on the url `/oauth/token`. It requires the following information:
+
+- client_id // Unique string of client
+- client_secret // client secret key
+- grant_type // refresh_token
+- refresh_token //the refresh token associated with the access token
+- redirect_uri //redirect uri provided in the previous step 
+
+The request should additionally have the following header:
+
+`'Content-Type': 'application/x-www-form-urlencoded'`
+
+and the data must be provided within the body of a post request.
+
+The server will respond with an access token and a new refresh token.
+
+[back](#top)
+
 <a id='url-resource'></a>
 ### Access Protected Resource
 
@@ -148,6 +169,6 @@ An example of access to protected reosurce can be simulated using a GET on the U
 }
 ```
 
-The s erver will respond with a positive messagge in case of a correct request.
+The server will respond with a positive messagge in case of a correct request.
 
 [back](#top)
