@@ -48,12 +48,6 @@ app.all('*', function(req, res, next){
   res.redirect(307, 'https://' + req.hostname + req.url)
 })
 ```
-```js
-https.createServer({
-  key: fs.readFileSync('./cert/server.key'),
-  cert: fs.readFileSync('./cert/server.cert'),
-}, app).listen(port)
-```
 You also have to insert this object in the document `clients` in MongoDB:
 ```json
 {

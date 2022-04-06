@@ -33,7 +33,6 @@ app.use('/secure', (req,res,next) => {
 },oauthServer.authenticate(), require('./routes/secure.js')) // routes to access the protected stuff
 
 http.createServer(app).listen(80)
-//(Comment out next 5 lines if you want to run a test)
 https.createServer({
   key: fs.readFileSync('./cert/server.key'),
   cert: fs.readFileSync('./cert/server.cert'),
