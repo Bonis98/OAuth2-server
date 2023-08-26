@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const config = require('../config.json');
 require('./DB/client');
 require('./DB/user');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const saltRounds = 10; //Recommended by npmjs.com
 
-mongoose.connect(config.connectString);
+require('dotenv').config();
+mongoose.connect(process.env.CONNECTSTRING);
 
 module.exports = {
   /**

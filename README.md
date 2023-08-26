@@ -18,12 +18,11 @@ Example of an Oauth 2.0 server written in Nodejs. The server is based on Oauth2-
 # Database
 
 The Oauth 2.0 Server require a MongoDB connection. The DB structure can be seen in `utilities/DB`.
-In order to provide the connection string, you have to create a file called `config.json` with this structure
-```json
-{
-  "connectString":"string provided by MongoDB"
-}
+In order to provide the connection string, you have to create a file called `.env` and insert with this structure
+```bash
+CONNECTSTRING = mongodb://127.0.0.1:1234
 ```
+Keep in mind that writing "localhost" will not work for some reason.
 
 [back](#top)
 
@@ -35,30 +34,6 @@ You can generate them using the command:
 ```shell
 openssl req -nodes -new -x509 -keyout server.key -out server.cert
 ```
-
-[back](#top)
-
-<a id='test'></a>
-# Test
-
-In order to run a test you have to remove the HTTPS support by commenting out these lines in the `app.js` file:
-```js
-app.all('*', function(req, res, next){
-  if (req.secure) return next()
-  res.redirect(307, 'https://' + req.hostname + req.url)
-})
-```
-You also have to insert this object in the document `clients` in MongoDB:
-```json
-{
-"clientId": "test_client_id",
-"clientSecret":"test_client_secret",
-"grants":["authorization_code","refresh_token"],
-"redirectUris":["http://localhost/client/register"],
-"__v": 0
-}
-```
-Running a test will create a test user (username: username, password:password, name:exmaple). If a test is runned twice, user creation will return an error (due to duplicate user), you have to delete from MongoDB the test user before re-run it.
 
 [back](#top)
 

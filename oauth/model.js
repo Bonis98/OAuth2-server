@@ -5,9 +5,9 @@ require('../utilities/DB/user');
 require('../utilities/DB/token');
 const crypto = require('crypto');
 const promise = require('promise');
-const config = require('../config.json');
 
-mongoose.connect(config.connectString);
+require('dotenv').config();
+mongoose.connect(process.env.CONNECTSTRING);
 
 module.exports = {
   /**

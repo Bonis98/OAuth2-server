@@ -10,6 +10,7 @@
     "bcrypt": "^5.0.1",
     "chai": "^4.3.6",
     "chai-http": "^4.3.0",
+    "dotenv": "^16.3.1",
     "express": "~4.16.1",
     "express-oauth-server": "^2.0.0",
     "mocha": "^9.2.2",
