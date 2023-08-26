@@ -28,16 +28,23 @@ router.post('/authorize', (req,res,next) => {
       ]
       .map(a => `${a}=${req.body[a]}`)
       .join('&')
+      // error handling: if something's broke, keep the user in the same page, signaling the error
       if (err === 'User is not registered') res.redirect(`/oauth/authorize?user=false&${params}`)
       else if (!result) res.redirect(`/oauth/authorize?success=false&${params}`)
       else res.redirect(`/oauth/authorize?error=true&${params}`)
     }
+    // if it's ok then go to the next endpoint
     else next()
   })
 }, (req, res, next) => {
+  
+  // this is for logging of the flow
   DebugControl.log.flow('authorize')
+  console.log('Body: ' + req.body.username);
   return next()
   },
+
+  // consider req.body.username as the user identifier for the authentication
   oauthServer.authorize({
     authenticateHandler: {
       handle: req => {
