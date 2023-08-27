@@ -56,8 +56,14 @@ router.post('/authorize', (req,res,next) => {
 
 //Get token from auth code
 router.post('/token', (req,res,next) => {
-  DebugControl.log.flow('Token')
-  next()
-},oauthServer.token())  // Sends back token
+  DebugControl.log.flow('Token');
+  next();
+}, oauthServer.token())  // Sends back token
+
+// Send user info back
+router.get('/username', (req, res, next) => {
+  DebugControl.log.flow('Get username');
+  next();
+}, oauthServer.authenticate(), (req, res) => {res.send(res.locals.oauth.token.user)});
 
 module.exports = router

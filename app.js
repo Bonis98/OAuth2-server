@@ -29,8 +29,9 @@ app.use('/oauth', require('./routes/auth.js')) // routes to access the auth stuf
 // Note that the next router uses middleware. That protects all routes within this middleware
 app.use('/secure', (req,res,next) => {
   DebugControl.log.flow('Authentication')
-  return next()
-},oauthServer.authenticate(), require('./routes/secure.js')) // routes to access the protected stuff
+  return next();
+  // Se autentica e va tutto bene rimanda alla route definita in ./routes/secure.js
+}, oauthServer.authenticate(), require('./routes/secure.js')) // routes to access the protected stuff
 
 http.createServer(app).listen(80)
 https.createServer({
