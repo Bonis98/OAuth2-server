@@ -98,36 +98,5 @@ module.exports = {
     catch(ex){
       throw ex;
     }
-  },
-
-  /**
-   * Get the username given the access token
-   * @param {string} access_token
-   */
-  getUserName: async function(access_token, callback){
-    //Prepare the model
-    const tokenModel = new mongoose.model('token');
-    try{
-      // query tokens collection
-      const tokenRetrieved = await tokenModel.findOne({accessToken: access_token}).exec();
-      if (!tokenRetrieved) 
-        return callback('No token retrieved', null);
-
-      const userId = tokenRetrieved.user_id;
-      const userModel = new mongoose.model('token');
-      try {
-        // query users collection
-        const userRetrieved = await userModel.findById(userId).exec();
-        if (!userRetrieved) 
-          return callback('No user with that id', null);
-        return callback(null, userRetrieved.userName);
-      }
-      catch(ex){
-        throw ex;
-      }
-    }
-    catch(ex){
-      throw ex;
-    }
   }
 }
